@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.grecaptcha-badge {
+  display: none !important;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+  font-style: normal;
+  overflow-x: hidden;
+}
+
+/* .content {
+  max-width: 1200px;
+  width: 98%;
+  margin: 0 auto;
+} */
+
+.gradient {
+  background-image: linear-gradient(
+    to right bottom,
+    #353737,
+    #3a3f3f,
+    #3f4748,
+    #445051,
+    #49585a
+  );
+}
+
+.content {
+  max-width: 1300px !important;
+  width: 90%;
+  /* overflow: hidden; */
+}
+
+.text-outline {
+  color: white;
+  -webkit-text-stroke: 1.5px #93d5e1; /* Borde celeste */
+  text-shadow:
+    0 0 10px rgba(147, 213, 225, 0.3),
+    0 0 20px rgba(147, 213, 225, 0.2);
+}
+
+/* en tu CSS global */
+.card-glow:hover .glow-strip {
+  filter: drop-shadow(0 6px 10px rgba(136, 135, 232, 0.35));
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* en tu CSS global */
+.card-glow:hover .glow-strip {
+  filter: drop-shadow(0 6px 12px rgba(136, 135, 232, 0.35));
+}
+
+/* Estilos para las cards de clientes */
+.client-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.client-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: inherit;
+  z-index: 10;
+}
+
+/* Mejora visual del scroll horizontal */
+.client-scroller {
+  scroll-behavior: smooth;
+  scroll-padding: 0 2rem;
+}
+
+/* Animación suave para el botón "Ver más" */
+@keyframes slide-right {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.client-card button:hover span[aria-hidden] {
+  animation: slide-right 0.6s ease-in-out infinite;
+}
+
+/* Efecto hover en las cards activas */
+.client-card.active {
+  transform: scale(1.02);
+  transition: transform 0.3s ease;
+}
+
+/* Sombra mejorada para cards */
+.client-card-shadow {
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.client-card:hover.client-card-shadow {
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.2),
+    0 10px 10px -5px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Truncar texto con ellipsis */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
