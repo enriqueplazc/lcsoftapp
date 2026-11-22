@@ -32,7 +32,7 @@ export function SiteHeader({ solid = false }: { solid?: boolean }) {
       }`}
     >
       <Container className="flex h-20 items-center justify-between gap-6">
-        <a href="/#inicio" className="shrink-0" aria-label="LC Soft, ir al inicio">
+        <a href="/#inicio" className="shrink-0" aria-label="LC Software & Consultoría, ir al inicio">
           <img src={logo} alt="LC Software & Consultoría" className="h-11 w-auto sm:h-12" width={192} height={48} />
         </a>
 

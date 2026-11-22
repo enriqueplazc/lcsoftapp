@@ -71,7 +71,7 @@ export function AdminLayout({ children }: Props) {
       `}>
         {/* Logo */}
         <div className="px-6 py-6 border-b border-white/[0.06]">
-          <img src={LogoWhite} alt="LC Soft" className="h-15 opacity-90" />
+          <img src={LogoWhite} alt="LC Software & Consultoría" className="h-15 opacity-90" />
           <div className="flex items-center gap-2 mt-3">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-white/30 text-xs tracking-wider">Panel de administración</span>
@@ -128,7 +128,7 @@ export function AdminLayout({ children }: Props) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <img src={LogoWhite} alt="LC Soft" className="h-6 opacity-90" />
+          <img src={LogoWhite} alt="LC Software & Consultoría" className="h-6 opacity-90" />
           <div className="w-8" />
         </header>
 

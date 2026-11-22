@@ -1,8 +1,5 @@
 // src/content/landing.ts
-// Textos de la home. Lo marcado con LOREM es provisional: reemplazar cuando esté el texto final.
-
-const LOREM =
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+// Textos de la home.
 
 export const hero = {
   badge: "Software de planillas · Desde 2011",
@@ -157,12 +154,14 @@ export const customSoftware = {
 };
 
 export const about = {
-  title: "Sobre LC Soft",
+  title: "Sobre LC Software & Consultoría",
   text:
     "Somos una empresa peruana de tecnología y outsourcing de RR.HH. que desde 2011 diseña, integra y opera soluciones con foco en resultados: software de planillas, sistemas a medida y soporte continuo.",
-  // LOREM: reemplazar por la misión y visión definitivas
-  mission: LOREM,
-  vision: LOREM,
+  // Provisional: reemplazar cuando esté la misión y visión definitivas
+  mission:
+    "Simplificar la gestión de planillas y de las operaciones de nuestros clientes con software confiable, cercano y hecho en el Perú, para que cada empresa cumpla con sus trabajadores y con la ley sin errores y se enfoque en hacer crecer su negocio.",
+  vision:
+    "Ser la empresa peruana de referencia en software de planillas y soluciones a medida, reconocida por la confianza de nuestros clientes, la calidad de nuestro soporte y la capacidad de llevar a cada empresa, del sector que sea, al siguiente nivel con tecnología.",
 };
 
 export const faqs = [

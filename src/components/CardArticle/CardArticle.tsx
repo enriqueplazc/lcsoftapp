@@ -53,7 +53,7 @@ export function CardArticle({ value: data }: CardArticleProps): JSX.Element {
           ) : (
             // Respaldo cuando el artículo no tiene imagen o la URL está rota
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#542DA0] to-[#8887E8]">
-              <img src={logo} alt="LC Soft" className="w-1/2 max-w-[220px] opacity-90" />
+              <img src={logo} alt="LC Software & Consultoría" className="w-1/2 max-w-[220px] opacity-90" />
             </div>
           )}
         </figure>
