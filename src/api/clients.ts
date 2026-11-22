@@ -19,11 +19,31 @@ export type Client = {
   contact_phone: string | null;
   contact_email: string | null;
   
+  // Pistas calculadas en la BD (columnas generadas). Son lo único del contacto
+  // que puede leer un visitante anónimo; el contacto completo se pide a la
+  // Edge Function reveal-contact tras pasar reCAPTCHA.
+  has_contact?: boolean;
+  contact_first_name?: string | null;
+  contact_phone_hint?: string | null;
+  contact_email_tld?: string | null;
+
   created_at: string;
   updated_at: string;
 };
 
-export type ClientInput = Omit<Client, "id" | "created_at" | "updated_at">;
+type GeneratedFields =
+  | "has_contact"
+  | "contact_first_name"
+  | "contact_phone_hint"
+  | "contact_email_tld";
+
+export type ClientInput = Omit<Client, "id" | "created_at" | "updated_at" | GeneratedFields>;
+
+/** Columnas que puede leer el público (sin el contacto completo). */
+const PUBLIC_CLIENT_COLUMNS =
+  "id, name, logo_url, sector, blurb, details, url, gradient_class, order_index, is_active, " +
+  "contact_position, has_contact, contact_first_name, contact_phone_hint, contact_email_tld, " +
+  "created_at, updated_at";
 
 /**
  * Obtener todos los clientes activos (público)
@@ -31,12 +51,12 @@ export type ClientInput = Omit<Client, "id" | "created_at" | "updated_at">;
 export async function getActiveClients() {
   const { data, error } = await supabase
     .from("clients")
-    .select("*")
+    .select(PUBLIC_CLIENT_COLUMNS)
     .eq("is_active", true)
     .order("order_index", { ascending: true });
 
   if (error) throw error;
-  return data as Client[];
+  return data as unknown as Client[];
 }
 
 /**

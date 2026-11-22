@@ -43,13 +43,13 @@ export const Articles = () => {
   }
 
   return (
-    <Section id="article">
+    <Section id="article" once y={40}>
       <Element name="article">
-        <div className="py-20 bg-white">
+        <div className="py-24 sm:py-32">
           <div className="content overflow-hidden m-auto">
             <div className="text-center">
-              <h3 className="text-4xl font-bold">Artículos de interés</h3>
-              <p className="my-12 max-w-[60em] w-[100%] m-auto">
+              <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight text-white">Artículos de interés</h2>
+              <p className="mt-5 mb-14 max-w-[60em] w-[100%] m-auto text-slate-400">
                 {articles.length === 0 && !loading
                   ? "Próximamente publicaremos contenido de valor sobre tecnología y desarrollo."
                   : "Explora nuestros últimos artículos sobre desarrollo de software, tecnología y mejores prácticas."}
@@ -68,7 +68,7 @@ export const Articles = () => {
                   <CardArticle
                     key={article.id}
                     value={{
-                      image: article.main_image_url || "https://via.placeholder.com/800x400?text=Sin+Imagen",
+                      image: article.main_image_url || "",
                       date: article.published_date || new Date().toISOString(),
                       title: article.title,
                       id: String(article.id),

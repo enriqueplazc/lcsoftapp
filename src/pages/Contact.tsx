@@ -1,13 +1,17 @@
 // src/pages/Contacto.tsx
 import { useState, useEffect } from "react";
-import { DefaultLayout } from "../layouts/DefaultLayout";
-import { Header } from "../components/Header";
+import { useSeo } from "../hooks/use-seo";
 import { motion } from "framer-motion";
-import {
-  EnvelopeIcon,
-  PhoneIcon,
-  ClockIcon,
-} from "@heroicons/react/24/outline";
+import { Clock, Mail, MessageCircle, Phone, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { SiteHeader } from "../sections/Landing/SiteHeader";
+import { SiteFooter } from "../sections/Landing/SiteFooter";
+import { WhatsAppFloat } from "../sections/Landing/WhatsAppFloat";
+import { Container, Eyebrow, GradientText } from "../sections/Landing/ui";
+import { SITE, whatsappLink } from "../content/site";
+
+const inputCls =
+  "w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white placeholder-slate-500 transition focus:border-[#5DADC6]/60 focus:outline-none focus:ring-2 focus:ring-[#5DADC6]/30";
+const labelCls = "mb-2 block text-sm font-medium text-slate-300";
 
 // Declaración global para reCAPTCHA
 declare global {
@@ -17,6 +21,7 @@ declare global {
 }
 
 export function Contacto() {
+  useSeo("Contacto", "Contáctanos para una demo de TDIPLAN, outsourcing de planillas o desarrollo de software a medida.", "/contact");
   const [formData, setFormData] = useState({
     tipo: "",
     nombre: "",
@@ -120,267 +125,189 @@ export function Contacto() {
   }
 
   return (
-    <DefaultLayout>
-      <Header redirect={true} />
-      
-      <section className="py-20 bg-gradient-to-b from-mine-shaft2 to-[#0a0a0a] min-h-screen">
-        <div className="content m-auto">
+    <div className="landing min-h-screen bg-[#0b0d18] text-slate-200 antialiased">
+      <SiteHeader />
+      <main className="relative overflow-hidden pb-24 pt-32 sm:pt-40">
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div className="absolute left-1/2 top-[-10%] h-[460px] w-[860px] -translate-x-1/2 rounded-full bg-[#2E7FA0]/25 blur-[120px]" />
+        </div>
+
+        <Container className="relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            className="mx-auto flex max-w-2xl flex-col items-center gap-5 text-center"
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Conversemos sobre tu proyecto
+            <Eyebrow>Contacto</Eyebrow>
+            <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+              Conversemos sobre <GradientText>tu proyecto</GradientText>
             </h1>
-            <p className="text-white/70 text-lg max-w-2xl mx-auto">
-              Cuéntanos tus necesidades y te ayudaremos a encontrar la mejor
-              solución tecnológica para tu negocio.
+            <p className="text-lg text-slate-400">
+              Agenda una demo de TDIPLAN, consulta por el outsourcing de planillas o cuéntanos qué software necesitas.
             </p>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-            
+          <div className="mt-16 grid items-start gap-8 lg:grid-cols-[1fr_1.4fr]">
             {/* Información de contacto */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="space-y-8"
+            <motion.aside
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="flex flex-col gap-4"
             >
-              <div className="bg-white/5 rounded-2xl p-8 border border-white/10">
-                <h2 className="text-2xl font-bold text-white mb-6">
-                  Información de Contacto
-                </h2>
+              <a
+                href={whatsappLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-4 rounded-2xl border border-[#5DADC6]/30 bg-gradient-to-r from-[#14374a] to-[#111527] p-6 transition hover:border-[#5DADC6]/60"
+              >
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#25D366]/15">
+                  <MessageCircle className="h-6 w-6 text-[#25D366]" aria-hidden />
+                </span>
+                <span>
+                  <span className="block font-semibold text-white">Escríbenos por WhatsApp</span>
+                  <span className="text-sm text-slate-400">La forma más rápida de hablar con un asesor</span>
+                </span>
+              </a>
 
-                <div className="space-y-6">
-                  {/* Teléfonos */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                      <PhoneIcon className="w-6 h-6 text-green-400" />
-                    </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+                <ul className="flex flex-col gap-6">
+                  <li className="flex items-start gap-4">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5">
+                      <Phone className="h-5 w-5 text-[#5DADC6]" aria-hidden />
+                    </span>
                     <div>
-                      <h3 className="text-white font-semibold mb-1">Teléfonos</h3>
-                      <p className="text-white/70 text-sm">
-                        <a href="tel:+516355718" className="hover:text-white transition">
-                          954 760 305
-                        </a>
+                      <h2 className="text-sm font-semibold text-white">Teléfono</h2>
+                      <a href={`tel:${SITE.phoneE164}`} className="text-slate-400 hover:text-white">{SITE.phoneDisplay}</a>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-4">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5">
+                      <Mail className="h-5 w-5 text-[#5DADC6]" aria-hidden />
+                    </span>
+                    <div>
+                      <h2 className="text-sm font-semibold text-white">Email de ventas</h2>
+                      <a href={`mailto:${SITE.salesEmail}`} className="text-slate-400 hover:text-white">{SITE.salesEmail}</a>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-4">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5">
+                      <Clock className="h-5 w-5 text-[#5DADC6]" aria-hidden />
+                    </span>
+                    <div>
+                      <h2 className="text-sm font-semibold text-white">Horario de atención</h2>
+                      <p className="text-slate-400">
+                        Lunes a viernes: 9:00 a. m. – 6:00 p. m.
                         <br />
-                        <a href="tel:+51954760305" className="hover:text-white transition">
-                          952 138 066
-                        </a>
+                        Sábados: 9:00 a. m. – 11:00 a. m.
                       </p>
                     </div>
-                  </div>
-
-                  {/* Email */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center flex-shrink-0">
-                      <EnvelopeIcon className="w-6 h-6 text-purple-400" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-semibold mb-1">Email</h3>
-                      <p className="text-white/70 text-sm">
-                        <a href="mailto:olazaro@lcsoft.pe" className="hover:text-white transition">
-                          olazaro@lcsoft.pe                        
-                        </a><br />
-                        <a href="mailto:olazaro@lcsoft.pe" className="hover:text-white transition">
-                          elazaro@lcsoft.pe                        
-                        </a>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Horario */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center flex-shrink-0">
-                      <ClockIcon className="w-6 h-6 text-orange-400" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-semibold mb-1">
-                        Horario de Atención
-                      </h3>
-                      <p className="text-white/70 text-sm">
-                        Lunes a Viernes: 9:00 AM - 6:00 PM
-                        <br />
-                        Sábados: 9:00 AM - 11:00 AM
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                  </li>
+                </ul>
               </div>
 
-              {/* Nota de seguridad */}
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 text-sm text-blue-200">
-                <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                  <p>
-                    Verifique sus datos antes de enviar el formulario.
-                  </p>
-                </div>
-              </div>
-            </motion.div>
+              <p className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-sm text-slate-400">
+                <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#5DADC6]" aria-hidden />
+                Tus datos solo se usan para responder tu consulta.
+              </p>
+            </motion.aside>
 
             {/* Formulario */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-white/5 rounded-2xl p-8 border border-white/10"
+              className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-10"
             >
-              <h2 className="text-2xl font-bold text-white mb-6">
-                Envíanos un mensaje
-              </h2>
+              <h2 className="text-2xl font-semibold text-white">Envíanos un mensaje</h2>
+              <p className="mt-1 text-sm text-slate-400">Te respondemos lo antes posible.</p>
 
               {sent ? (
-                <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-6 text-center">
-                  <div className="text-green-400 text-5xl mb-4">✓</div>
-                  <h3 className="text-white font-semibold text-xl mb-2">
-                    ¡Mensaje enviado!
-                  </h3>
-                  <p className="text-white/70">
-                    Gracias por contactarnos. Te responderemos pronto.
-                  </p>
+                <div className="mt-8 flex flex-col items-center gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-8 text-center">
+                  <CheckCircle2 className="h-12 w-12 text-emerald-300" aria-hidden />
+                  <h3 className="text-xl font-semibold text-white">¡Mensaje enviado!</h3>
+                  <p className="text-slate-300">Gracias por contactarnos. Te responderemos pronto.</p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  {/* Mensaje de error */}
+                <form onSubmit={handleSubmit} className="mt-8 grid gap-5 sm:grid-cols-2">
                   {error && (
-                    <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-sm text-red-200">
+                    <div className="rounded-xl border border-red-400/20 bg-red-400/10 p-4 text-sm text-red-200 sm:col-span-2">
                       {error}
                     </div>
                   )}
 
-                  {/* Tipo de consulta */}
-                  <div>
-                    <label className="block text-white/90 text-sm font-medium mb-2">
-                      Tipo de consulta 
-                    </label>
+                  <div className="sm:col-span-2">
+                    <label htmlFor="c-tipo" className={labelCls}>Tipo de consulta</label>
                     <select
+                      id="c-tipo"
                       value={formData.tipo}
                       onChange={(e) => handleChange("tipo", e.target.value)}
                       required
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      className={inputCls}
                     >
-                      <option value="" className="bg-gray-900">
-                        Selecciona una opción
-                      </option>
-                      <option value="cotizacion" className="bg-gray-900">
-                        Cotización
-                      </option>
-                      <option value="soporte" className="bg-gray-900">
-                        Soporte técnico
-                      </option>
-                      <option value="informacion" className="bg-gray-900">
-                        Información de productos
-                      </option>
-                      <option value="demostracion" className="bg-gray-900">
-                        Demostración
-                      </option>
-                      <option value="otro" className="bg-gray-900">
-                        Otro
-                      </option>
+                      <option value="" className="bg-[#101322]">Selecciona una opción</option>
+                      <option value="demostracion" className="bg-[#101322]">Demo de TDIPLAN</option>
+                      <option value="informacion" className="bg-[#101322]">Información de productos y servicios</option>
+                      <option value="cotizacion" className="bg-[#101322]">Software a medida</option>
+                      <option value="soporte" className="bg-[#101322]">Soporte técnico</option>
+                      <option value="otro" className="bg-[#101322]">Otro</option>
                     </select>
                   </div>
 
-                  {/* Nombre */}
                   <div>
-                    <label className="block text-white/90 text-sm font-medium mb-2">
-                      Nombre completo 
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.nombre}
-                      onChange={(e) => handleChange("nombre", e.target.value)}
-                      required
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                      placeholder="Juan Pérez"
-                    />
+                    <label htmlFor="c-nombre" className={labelCls}>Nombre completo</label>
+                    <input id="c-nombre" type="text" autoComplete="name" value={formData.nombre}
+                      onChange={(e) => handleChange("nombre", e.target.value)} required className={inputCls} placeholder="Juan Pérez" />
                   </div>
 
-                  {/* Email */}
                   <div>
-                    <label className="block text-white/90 text-sm font-medium mb-2">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => handleChange("email", e.target.value)}
-                      required
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                      placeholder="juan@empresa.com"
-                    />
+                    <label htmlFor="c-empresa" className={labelCls}>Empresa</label>
+                    <input id="c-empresa" type="text" autoComplete="organization" value={formData.empresa}
+                      onChange={(e) => handleChange("empresa", e.target.value)} className={inputCls} placeholder="Nombre de tu empresa" />
                   </div>
 
-                  {/* Teléfono */}
                   <div>
-                    <label className="block text-white/90 text-sm font-medium mb-2">
-                      Teléfono
-                    </label>
-                    <input
-                      type="tel"
-                      value={formData.telefono}
-                      onChange={(e) => handleChange("telefono", e.target.value)}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                      placeholder="999 999 999"
-                    />
+                    <label htmlFor="c-email" className={labelCls}>Email</label>
+                    <input id="c-email" type="email" autoComplete="email" value={formData.email}
+                      onChange={(e) => handleChange("email", e.target.value)} required className={inputCls} placeholder="juan@empresa.com" />
                   </div>
 
-                  {/* Empresa */}
                   <div>
-                    <label className="block text-white/90 text-sm font-medium mb-2">
-                      Empresa
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.empresa}
-                      onChange={(e) => handleChange("empresa", e.target.value)}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                      placeholder="Nombre de tu empresa"
-                    />
+                    <label htmlFor="c-tel" className={labelCls}>Teléfono</label>
+                    <input id="c-tel" type="tel" autoComplete="tel" value={formData.telefono}
+                      onChange={(e) => handleChange("telefono", e.target.value)} className={inputCls} placeholder="999 999 999" />
                   </div>
 
-                  {/* Mensaje */}
-                  <div>
-                    <label className="block text-white/90 text-sm font-medium mb-2">
-                      Mensaje 
-                    </label>
-                    <textarea
-                      value={formData.mensaje}
-                      onChange={(e) => handleChange("mensaje", e.target.value)}
-                      required
-                      rows={5}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
-                      placeholder="Cuéntanos sobre tu proyecto..."
-                    />
+                  <div className="sm:col-span-2">
+                    <label htmlFor="c-msg" className={labelCls}>Mensaje</label>
+                    <textarea id="c-msg" value={formData.mensaje} onChange={(e) => handleChange("mensaje", e.target.value)}
+                      required rows={5} className={`${inputCls} resize-none`} placeholder="Cuéntanos qué necesitas..." />
                   </div>
 
-                  {/* Botón */}
-                  <button
-                    type="submit"
-                    disabled={sending || !recaptchaLoaded}
-                    className="w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20"
-                  >
-                    {sending ? "Enviando..." : !recaptchaLoaded ? "Cargando..." : "Enviar Mensaje"}
-                  </button>
-
-                  <p className="text-white/40 text-xs text-center">
-                    Al enviar este formulario, aceptas nuestra política de privacidad.
-                    <br />
-                    Protegido por reCAPTCHA - 
-                    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" className="underline hover:text-white/60"> Privacidad</a> y 
-                    <a href="https://policies.google.com/terms" target="_blank" rel="noopener" className="underline hover:text-white/60"> Términos</a>
-                  </p>
+                  <div className="flex flex-col gap-3 sm:col-span-2">
+                    <button
+                      type="submit"
+                      disabled={sending || !recaptchaLoaded}
+                      className="w-full rounded-full bg-[#5DADC6] px-6 py-3 font-semibold text-[#101322] shadow-lg shadow-[#5DADC6]/20 transition hover:bg-[#7cc0d6] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {sending ? "Enviando..." : !recaptchaLoaded ? "Cargando..." : "Enviar mensaje"}
+                    </button>
+                    <p className="text-center text-xs text-slate-500">
+                      Protegido por reCAPTCHA ·{" "}
+                      <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-300">Privacidad</a>{" "}
+                      y{" "}
+                      <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-300">Términos</a>
+                    </p>
+                  </div>
                 </form>
               )}
             </motion.div>
           </div>
-        </div>
-      </section>
-    </DefaultLayout>
+        </Container>
+      </main>
+      <SiteFooter />
+      <WhatsAppFloat />
+    </div>
   );
 }

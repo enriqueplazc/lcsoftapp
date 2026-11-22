@@ -113,17 +113,10 @@ export const Contact = () => {
                       </h4>
                       <p className="text-white/70 text-sm">
                         <a
-                          href="tel:+51635-5718"
+                          href="tel:+51939831937"
                           className="hover:text-white transition"
                         >
-                          635-5718
-                        </a>
-                        <br />
-                        <a
-                          href="tel:+51954760305"
-                          className="hover:text-white transition"
-                        >
-                          954 760 305
+                          +51 939 831 937
                         </a>
                       </p>
                     </div>
@@ -138,10 +131,10 @@ export const Contact = () => {
                       <h4 className="text-white font-semibold mb-1">Email</h4>
                       <p className="text-white/70 text-sm">
                         <a
-                          href="mailto:olazaro@lcsoft.pe"
+                          href="mailto:elazaro@lcsoft.pe"
                           className="hover:text-white transition"
                         >
-                          olazaro@lcsoft.pe
+                          elazaro@lcsoft.pe
                         </a>
                       </p>
                     </div>

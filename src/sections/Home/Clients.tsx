@@ -1,6 +1,6 @@
-// src/sections/Home/Clients.tsx - CON PROTECCIÓN
+// src/sections/Home/Clients.tsx - Carrusel continuo "Empresas que confían" + modal con protección
 import { Element } from "react-scroll";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { getActiveClients, type Client } from "../../api/clients";
@@ -12,48 +12,157 @@ declare global {
   }
 }
 
-// Funciones de ofuscación
-function obfuscateName(fullName: string | null): string {
-  if (!fullName) return "N/A";
-  const parts = fullName.trim().split(" ");
-  return parts[0]; // Solo primer nombre
+// Vista ofuscada del contacto, a partir de las pistas que calcula la BD
+// (el contacto completo nunca llega al navegador sin pasar reCAPTCHA)
+function obfuscatePhone(hint: string | null | undefined): string {
+  return hint ? `${hint} *** ***` : "*** *** ***";
 }
 
-function obfuscatePhone(phone: string | null): string {
-  if (!phone) return "N/A";
-  const cleaned = phone.replace(/\D/g, "");
-  if (cleaned.length >= 6) {
-    return `${cleaned.substring(0, 3)} *** ***`;
-  }
-  return "*** *** ***";
+function obfuscateEmail(tld: string | null | undefined): string {
+  return `***@***.${tld || "***"}`;
 }
 
-function obfuscateEmail(email: string | null): string {
-  if (!email) return "N/A";
-  const parts = email.split("@");
-  if (parts.length === 2) {
-    return `***@***.${parts[1].split(".").pop()}`;
-  }
-  return "***@***.***";
+const DEFAULT_GRADIENT = "from-[#542DA0] to-[#8887E8]";
+
+/**
+ * Convierte "from-[#06b6d4] to-[#0ea5e9]" en un degradado CSS real.
+ * No dependemos de las clases de Tailwind porque los colores vienen de la BD
+ * y Tailwind solo genera las clases que aparecen escritas en el código
+ * (por eso algunas tarjetas se quedaban sin franja de color).
+ */
+function gradientCss(cls: string | null | undefined, angle = 90): string {
+  const colors = (cls || DEFAULT_GRADIENT).match(/#[0-9a-fA-F]{3,8}/g) ?? [];
+  const [from, to] = colors.length >= 2 ? colors : ["#542DA0", "#8887E8"];
+  return `linear-gradient(${angle}deg, ${from}, ${to})`;
 }
+
+function initialsOf(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter((w) => /^[A-Za-zÁÉÍÓÚÑáéíóúñ]/.test(w) && w.length > 2)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+}
+
+/**
+ * Logo del cliente. Si no hay logo o la imagen no carga (URL rota del Supabase
+ * antiguo, archivo que no existe...), muestra las iniciales con el degradado del cliente.
+ */
+function ClientLogo({
+  client,
+  className = "",
+  initialsClass = "text-4xl",
+}: {
+  client: Client;
+  className?: string;
+  initialsClass?: string;
+}) {
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => setFailed(false), [client.logo_url]);
+
+  if (!client.logo_url || failed) {
+    return (
+      <span
+        className={`font-extrabold tracking-tight bg-clip-text text-transparent ${initialsClass}`}
+        style={{ backgroundImage: gradientCss(client.gradient_class) }}
+        aria-label={client.name}
+      >
+        {initialsOf(client.name) || "🏢"}
+      </span>
+    );
+  }
+
+  return (
+    <img
+      src={client.logo_url}
+      alt={`${client.name} logo`}
+      className={className}
+      loading="lazy"
+      draggable={false}
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+/** Una fila del carrusel infinito. Se duplica la lista para que el bucle no tenga cortes. */
+function MarqueeRow({
+  items,
+  reverse = false,
+  onSelect,
+}: {
+  items: Client[];
+  reverse?: boolean;
+  onSelect: (id: number) => void;
+}) {
+  // Repetimos hasta tener suficientes logos para cubrir pantallas anchas
+  const base = items.length < 6 ? [...items, ...items, ...items] : items;
+  const loop = [...base, ...base];
+  const duration = Math.max(25, base.length * 4); // segundos por vuelta
+
+  return (
+    <div className="lc-marquee group relative overflow-hidden py-3">
+      <div
+        className={`lc-marquee-track flex w-max gap-6 ${reverse ? "lc-marquee-reverse" : ""}`}
+        style={{ animationDuration: `${duration}s` }}
+      >
+        {loop.map((c, idx) => (
+          <button
+            key={`${c.id}-${idx}`}
+            type="button"
+            onClick={() => onSelect(c.id)}
+            aria-hidden={idx >= base.length ? true : undefined}
+            tabIndex={idx >= base.length ? -1 : 0}
+            title={`Ver ${c.name}`}
+            className="shrink-0 w-56 sm:w-64 rounded-2xl text-left shadow-lg transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl focus:outline-none focus-visible:ring-4 focus-visible:ring-white/60"
+            // La franja de color se pinta como fondo de la propia tarjeta:
+            // así respeta las esquinas redondeadas sin bordes blancos.
+            style={{
+              backgroundColor: "#fff",
+              backgroundImage: gradientCss(c.gradient_class),
+              backgroundSize: "100% 6px",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            <span className="flex h-32 sm:h-36 items-center justify-center px-6 pt-5">
+              <ClientLogo client={c} className="max-h-20 sm:max-h-24 max-w-full w-auto object-contain" />
+            </span>
+            <span className="block border-t border-gray-100 px-4 py-3">
+              <span className="block truncate text-sm font-semibold text-gray-900">{c.name}</span>
+              <span className="block truncate text-xs text-gray-500">{c.sector}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const MARQUEE_CSS = `
+@keyframes lc-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.lc-marquee-track { animation: lc-marquee linear infinite; }
+.lc-marquee-reverse { animation-direction: reverse; }
+.lc-marquee:hover .lc-marquee-track,
+.lc-marquee:focus-within .lc-marquee-track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .lc-marquee { overflow-x: auto; }
+  .lc-marquee-track { animation: none; }
+}
+`;
 
 export const Clients = () => {
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(0);
   const [openId, setOpenId] = useState<number | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Estado de verificación
   const [verifying, setVerifying] = useState(false);
   const [verified, setVerified] = useState(false);
   const [revealedContact, setRevealedContact] = useState<any>(null);
   const [honeypot, setHoneypot] = useState("");
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
-
-  const isPanningRef = useRef(false);
-  const startXRef = useRef(0);
-  const startScrollLeftRef = useRef(0);
 
   // Cargar reCAPTCHA
   useEffect(() => {
@@ -75,6 +184,14 @@ export const Clients = () => {
     loadClients();
   }, []);
 
+  // Cerrar el modal con la tecla Escape
+  useEffect(() => {
+    if (openId === null) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeModal();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openId]);
+
   async function loadClients() {
     try {
       const data = await getActiveClients();
@@ -86,89 +203,12 @@ export const Clients = () => {
     }
   }
 
-  const scrollToIndex = (idx: number, behavior: ScrollBehavior = "smooth") => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-    const children = scroller.children;
-    const el = children[idx] as HTMLElement | undefined;
-    if (!el) return;
-    const delta = el.offsetLeft - (scroller.clientWidth - el.clientWidth) / 2;
-    scroller.scrollTo({ left: delta, behavior });
-  };
-
-  useEffect(() => {
-    if (clients.length > 0) {
-      setTimeout(() => scrollToIndex(0, "auto"), 100);
-    }
-  }, [clients.length]);
-
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-
-    const onScroll = () => {
-      const centerX = scroller.scrollLeft + scroller.clientWidth / 2;
-      let bestIdx = 0;
-      let bestDist = Infinity;
-      Array.from(scroller.children).forEach((child, idx) => {
-        const el = child as HTMLElement;
-        const elCenter = el.offsetLeft + el.clientWidth / 2;
-        const dist = Math.abs(centerX - elCenter);
-        if (dist < bestDist) {
-          bestDist = dist;
-          bestIdx = idx;
-        }
-      });
-      setActive(bestIdx);
-    };
-
-    scroller.addEventListener("scroll", onScroll, { passive: true });
-    setTimeout(() => onScroll(), 200);
-    
-    return () => scroller.removeEventListener("scroll", onScroll);
-  }, [clients.length]);
-
-  const go = (dir: "left" | "right") => {
-    const next = Math.max(0, Math.min(clients.length - 1, active + (dir === "left" ? -1 : 1)));
-    setActive(next);
-    scrollToIndex(next);
-  };
-
-  const handleMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    if (e.button !== 1) return;
-    e.preventDefault();
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-    isPanningRef.current = true;
-    startXRef.current = e.clientX;
-    startScrollLeftRef.current = scroller.scrollLeft;
-    scroller.style.cursor = "grabbing";
-    scroller.classList.add("select-none");
-  };
-
-  const handleMouseMove: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    if (!isPanningRef.current) return;
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-    const dx = e.clientX - startXRef.current;
-    scroller.scrollLeft = startScrollLeftRef.current - dx;
-  };
-
-  const endPan = () => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-    isPanningRef.current = false;
-    scroller.style.cursor = "grab";
-    scroller.classList.remove("select-none");
-  };
-
-  const handleWheel: React.WheelEventHandler<HTMLDivElement> = (e) => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-      scroller.scrollLeft += e.deltaY;
-    }
-  };
+  // Con muchos clientes, dos filas en sentidos opuestos
+  const rows = useMemo(() => {
+    if (clients.length < 8) return [clients];
+    const half = Math.ceil(clients.length / 2);
+    return [clients.slice(0, half), clients.slice(half)];
+  }, [clients]);
 
   // Función para revelar contacto con reCAPTCHA
   async function revealContact(clientId: number) {
@@ -231,117 +271,36 @@ export const Clients = () => {
 
   return (
     <Element name="clients">
-      <div className="py-20 bg-mine-shaft2">
+      <style>{MARQUEE_CSS}</style>
+      <section aria-labelledby="clientes-titulo" className="py-16 sm:py-20">
         <div className="content m-auto">
           <div className="text-center text-alabasters">
-            <h3 className="text-white text-4xl font-bold">Nuestros clientes</h3>
-            <p className="my-12 max-w-[60em] w-[100%] m-auto">
+            <h2 id="clientes-titulo" className="text-white text-3xl sm:text-4xl font-semibold tracking-tight">Empresas que confían en nosotros</h2>
+            <p className="mt-4 mb-12 max-w-[60em] w-[100%] m-auto text-slate-400">
               Confían en nosotros para diseñar, integrar y operar soluciones críticas de negocio.
             </p>
           </div>
-
-          {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="text-white/70">Cargando clientes...</div>
-            </div>
-          ) : clients.length === 0 ? (
-            <div className="text-center text-white/70 py-12">
-              No hay clientes disponibles en este momento.
-            </div>
-          ) : (
-            <>
-              <div className="flex items-center justify-end gap-3 mb-4 text-white">
-                <button
-                  onClick={() => go("left")}
-                  disabled={active === 0}
-                  className="rounded-full bg-white/10 hover:bg-white/20 px-3 py-2 transition disabled:opacity-30 disabled:cursor-not-allowed"
-                  aria-label="Anterior"
-                >
-                  ‹
-                </button>
-                <button
-                  onClick={() => go("right")}
-                  disabled={active === clients.length - 1}
-                  className="rounded-full bg-white/10 hover:bg-white/20 px-3 py-2 transition disabled:opacity-30 disabled:cursor-not-allowed"
-                  aria-label="Siguiente"
-                >
-                  ›
-                </button>
-              </div>
-
-              <div
-                ref={scrollerRef}
-                className="overflow-x-auto no-scrollbar flex gap-6 pb-4 snap-x snap-mandatory cursor-grab"
-                style={{ paddingLeft: 'calc(50% - 210px)', paddingRight: 'calc(50% - 210px)' }}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={endPan}
-                onMouseUp={endPan}
-                onWheel={handleWheel}
-              >
-                {clients.map((c, idx) => (
-                  <motion.div
-                    key={c.id}
-                    className={`snap-center min-w-[280px] sm:min-w-[360px] lg:min-w-[420px] rounded-2xl bg-[#0f0f10] border border-white/10 text-white overflow-hidden relative isolate transition-all duration-300
-                                ${idx === active ? "ring-2 ring-white/30 shadow-2xl" : ""}`}
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.2 }}
-                    transition={{ duration: 0.35 }}
-                  >
-                    <div
-                      aria-hidden="true"
-                      className={`pointer-events-none absolute left-0 right-0 top-0 h-1.5 bg-gradient-to-r ${
-                        c.gradient_class || "from-[#542DA0] to-[#8887E8]"
-                      }`}
-                    />
-
-                    <div className="p-6 pt-7">
-                      <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center overflow-hidden ring-1 ring-white/10">
-                          {c.logo_url ? (
-                            <img
-                              src={c.logo_url}
-                              alt={`${c.name} logo`}
-                              className={`w-12 h-12 object-contain transition-all duration-500 ${
-                                idx === active 
-                                  ? "" 
-                                  : "grayscale opacity-40"
-                              }`}
-                              loading="lazy"
-                            />
-                          ) : (
-                            <span className="text-3xl">🏢</span>
-                          )}
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-lg font-bold leading-tight truncate">{c.name}</h4>
-                          <p className="text-sm text-white/60 mt-0.5">{c.sector}</p>
-                        </div>
-                      </div>
-
-                      <p className="mt-4 text-sm text-white/80 leading-relaxed line-clamp-3">
-                        {c.blurb}
-                      </p>
-
-                      <button
-                        onClick={() => setOpenId(c.id)}
-                        className="mt-5 inline-flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition-colors group"
-                      >
-                        Ver más
-                        <span aria-hidden className="transition-transform group-hover:translate-x-1">
-                          →
-                        </span>
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </>
-          )}
         </div>
-      </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center h-48">
+            <div className="text-white/70">Cargando clientes...</div>
+          </div>
+        ) : clients.length === 0 ? (
+          <div className="text-center text-white/70 py-12">
+            No hay clientes disponibles en este momento.
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {rows.map((row, i) => (
+              <MarqueeRow key={i} items={row} reverse={i % 2 === 1} onSelect={setOpenId} />
+            ))}
+            <p className="text-center text-sm text-white/50 pt-4">
+              Haz clic en cualquier empresa para ver el proyecto
+            </p>
+          </div>
+        )}
+      </section>
 
       {/* MODAL CON PROTECCIÓN */}
       <AnimatePresence>
@@ -382,20 +341,13 @@ export const Clients = () => {
 
                     <div className="relative">
                       <div
-                        className={`h-40 bg-gradient-to-r ${c.gradient_class || "from-[#542DA0] to-[#8887E8]"}`}
+                        className="h-40"
+                        style={{ backgroundImage: gradientCss(c.gradient_class, 135) }}
                       />
                       
                       <div className="absolute -bottom-16 left-8">
-                        <div className="w-32 h-32 rounded-2xl bg-white shadow-2xl flex items-center justify-center overflow-hidden ring-4 ring-white">
-                          {c.logo_url ? (
-                            <img
-                              src={c.logo_url}
-                              alt={`${c.name} logo`}
-                              className="w-28 h-28 object-contain"
-                            />
-                          ) : (
-                            <span className="text-6xl">🏢</span>
-                          )}
+                        <div className="w-40 h-40 rounded-2xl bg-white shadow-2xl flex items-center justify-center overflow-hidden ring-4 ring-white p-3">
+                          <ClientLogo client={c} className="w-full h-full object-contain" initialsClass="text-5xl" />
                         </div>
                       </div>
 
@@ -408,7 +360,7 @@ export const Clients = () => {
                       </button>
                     </div>
 
-                    <div className="pt-20 px-8 pb-8">
+                    <div className="pt-24 px-8 pb-8">
                       <div className="mb-6">
                         <h3 className="text-3xl font-bold text-gray-900 mb-2">
                           {c.name}
@@ -428,7 +380,7 @@ export const Clients = () => {
                       </div>
 
                       {/* INFORMACIÓN DE CONTACTO CON PROTECCIÓN */}
-                      {((c as any).contact_name || (c as any).contact_email || (c as any).contact_phone) && (
+                      {c.has_contact && (
                         <div className="border-t pt-6">
                           <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
                             Información de Contacto
@@ -437,7 +389,7 @@ export const Clients = () => {
                           {!verified ? (
                             // Vista ofuscada
                             <div className="bg-gray-50 rounded-xl p-6 space-y-4">
-                              {(c as any).contact_name && (
+                              {(c.contact_first_name || c.contact_position) && (
                                 <div className="flex items-start gap-3">
                                   <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -446,15 +398,15 @@ export const Clients = () => {
                                   </div>
                                   <div className="flex-1">
                                     <p className="text-sm text-gray-500 mb-1">Contacto</p>
-                                    <p className="font-semibold text-gray-900">{obfuscateName((c as any).contact_name)}</p>
-                                    {(c as any).contact_position && (
-                                      <p className="text-sm text-gray-600">{(c as any).contact_position}</p>
+                                    <p className="font-semibold text-gray-900">{c.contact_first_name || "Contacto"}</p>
+                                    {c.contact_position && (
+                                      <p className="text-sm text-gray-600">{c.contact_position}</p>
                                     )}
                                   </div>
                                 </div>
                               )}
 
-                              {(c as any).contact_phone && (
+                              {c.contact_phone_hint && (
                                 <div className="flex items-start gap-3">
                                   <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -463,12 +415,12 @@ export const Clients = () => {
                                   </div>
                                   <div className="flex-1">
                                     <p className="text-sm text-gray-500 mb-1">Teléfono</p>
-                                    <p className="font-semibold text-gray-500">{obfuscatePhone((c as any).contact_phone)}</p>
+                                    <p className="font-semibold text-gray-500">{obfuscatePhone(c.contact_phone_hint)}</p>
                                   </div>
                                 </div>
                               )}
 
-                              {(c as any).contact_email && (
+                              {c.contact_email_tld && (
                                 <div className="flex items-start gap-3">
                                   <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
                                     <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -477,7 +429,7 @@ export const Clients = () => {
                                   </div>
                                   <div className="flex-1">
                                     <p className="text-sm text-gray-500 mb-1">Email</p>
-                                    <p className="font-semibold text-gray-500">{obfuscateEmail((c as any).contact_email)}</p>
+                                    <p className="font-semibold text-gray-500">{obfuscateEmail(c.contact_email_tld)}</p>
                                   </div>
                                 </div>
                               )}

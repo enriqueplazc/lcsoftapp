@@ -1,28 +1,40 @@
-import { Element } from "react-scroll";
-import { DefaultLayout } from "../layouts/DefaultLayout";
-import { Header } from "../components/Header";
-import { Banner } from "../components/Banner";
-
-import { TabsWhatWeDo } from "../sections/Home/TabsWhatWeDo";
-import { ProcessSteps } from "../sections/Home/ProcessSteps";
-import { ServicesGrid } from "../sections/Home/ServicesGrid";
+import { SiteHeader } from "../sections/Landing/SiteHeader";
+import { Hero } from "../sections/Landing/Hero";
+import { Product } from "../sections/Landing/Product";
+import { Services } from "../sections/Landing/Services";
+import { CustomSoftware } from "../sections/Landing/CustomSoftware";
+import { About } from "../sections/Landing/About";
+import { Faq } from "../sections/Landing/Faq";
+import { FinalCta } from "../sections/Landing/FinalCta";
+import { SiteFooter } from "../sections/Landing/SiteFooter";
+import { WhatsAppFloat } from "../sections/Landing/WhatsAppFloat";
 import { Clients } from "../sections/Home/Clients";
 import { Articles } from "../sections/Home/Articles";
-import { Footer } from "../components/Footer";
+import { useSeo } from "../hooks/use-seo";
 
 export function Home() {
+  useSeo();
+
   return (
-    <DefaultLayout>
-      <Header redirect={false} />
-      <Element name="home">
-        <Banner />
-      </Element>
-      <TabsWhatWeDo />
-      <ProcessSteps />
-      <ServicesGrid />
-      <Clients />
-      <Articles />
-      <Footer />
-    </DefaultLayout>
+    <div className="landing min-h-screen bg-[#0b0d18] font-normal text-slate-200 antialiased">
+      <SiteHeader />
+      <main>
+        <Hero />
+        <div id="clientes" className="scroll-mt-16">
+          <Clients />
+        </div>
+        <Product />
+        <Services />
+        <CustomSoftware />
+        <About />
+        <div id="blog" className="scroll-mt-16">
+          <Articles />
+        </div>
+        <Faq />
+        <FinalCta />
+      </main>
+      <SiteFooter />
+      <WhatsAppFloat />
+    </div>
   );
 }

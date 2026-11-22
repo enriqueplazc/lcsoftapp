@@ -54,7 +54,7 @@ body {
 
 /* en tu CSS global */
 .card-glow:hover .glow-strip {
-  filter: drop-shadow(0 6px 10px rgba(136, 135, 232, 0.35));
+  filter: drop-shadow(0 6px 10px rgba(93, 173, 198, 0.35));
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -62,7 +62,7 @@ body {
 
 /* en tu CSS global */
 .card-glow:hover .glow-strip {
-  filter: drop-shadow(0 6px 12px rgba(136, 135, 232, 0.35));
+  filter: drop-shadow(0 6px 12px rgba(93, 173, 198, 0.35));
 }
 
 /* Estilos para las cards de clientes */
@@ -132,4 +132,18 @@ body {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+/* ===== Home renovada ===== */
+html {
+  scroll-behavior: smooth;
+}
+.landing {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 400;
+}
+.landing ::selection {
+  background: rgba(93, 173, 198, 0.35);
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }

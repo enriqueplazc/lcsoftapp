@@ -1,9 +1,23 @@
 // src/pages/Blog.tsx - VERSIÓN MEJORADA CON MEJOR DISEÑO
 import { useEffect, useState } from "react";
-import { DefaultLayout } from "../layouts/DefaultLayout";
 import { useParams, useNavigate } from "react-router-dom";
+import { useSeo } from "../hooks/use-seo";
+import { SiteHeader } from "../sections/Landing/SiteHeader";
+import { SiteFooter } from "../sections/Landing/SiteFooter";
+import { WhatsAppFloat } from "../sections/Landing/WhatsAppFloat";
+
+/** Marco de las páginas del blog: cabecera y pie de la web nueva, lectura sobre fondo claro. */
+function BlogShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="landing flex min-h-screen flex-col bg-[#F3F6FF] text-slate-800">
+      <SiteHeader solid />
+      <main className="flex-1 pt-20">{children}</main>
+      <SiteFooter />
+      <WhatsAppFloat />
+    </div>
+  );
+}
 import { EyeIcon, ArrowLeftIcon, ClockIcon } from "@heroicons/react/24/outline";
-import { Header } from "../components/Header";
 import { supabase } from "../lib/supabase";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
@@ -50,6 +64,7 @@ export function Blog() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [readingTime, setReadingTime] = useState(0);
+  useSeo(article?.title, article?.excerpt ?? undefined, `/blog/${id ?? ""}`);
 
   useEffect(() => {
     let mounted = true;
@@ -116,8 +131,7 @@ export function Blog() {
 
   if (loading) {
     return (
-      <DefaultLayout>
-        <Header redirect={true} />
+      <BlogShell>
         <div className="max-w-4xl mx-auto px-4 py-12 animate-pulse">
           <div className="bg-gray-300 h-8 w-3/4 mb-4 rounded" />
           <div className="bg-gray-300 h-4 w-1/2 mb-8 rounded" />
@@ -128,38 +142,36 @@ export function Blog() {
             <div className="bg-gray-300 h-4 w-4/6 rounded" />
           </div>
         </div>
-      </DefaultLayout>
+      </BlogShell>
     );
   }
 
   if (err) {
     return (
-      <DefaultLayout>
-        <Header redirect={true} />
+      <BlogShell>
         <div className="max-w-4xl mx-auto px-4 py-12">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
             <h1 className="text-2xl font-bold mb-2 text-red-900">Error</h1>
             <p className="text-red-600">{err}</p>
             <button
-              onClick={() => navigate("/blog")}
+              onClick={() => navigate("/#blog")}
               className="mt-4 text-blue-600 hover:underline"
             >
               ← Volver al blog
             </button>
           </div>
         </div>
-      </DefaultLayout>
+      </BlogShell>
     );
   }
 
   if (!article) {
     return (
-      <DefaultLayout>
-        <Header redirect={true} />
+      <BlogShell>
         <div className="max-w-4xl mx-auto px-4 py-12">
           <p>Artículo no disponible.</p>
         </div>
-      </DefaultLayout>
+      </BlogShell>
     );
   }
 
@@ -170,8 +182,7 @@ export function Blog() {
     article.author_avatar_url;
 
   return (
-    <DefaultLayout>
-      <Header redirect={true} />
+    <BlogShell>
 
       {/* Container principal con max-width para lectura óptima */}
       <article className="max-w-4xl mx-auto px-4 py-12">
@@ -235,6 +246,11 @@ export function Blog() {
             <img
               src={article.main_image_url}
               alt={article.title}
+              onError={(e) => {
+                // Si la imagen ya no existe (p. ej. estaba en el Supabase antiguo), ocultarla
+                const fig = e.currentTarget.closest("figure");
+                if (fig) (fig as HTMLElement).style.display = "none";
+              }}
               className="w-full rounded-xl shadow-lg"
               style={{ 
                 maxHeight: '600px', 
@@ -296,6 +312,6 @@ export function Blog() {
           </button>
         </div>
       </article>
-    </DefaultLayout>
+    </BlogShell>
   );
 }

@@ -120,7 +120,7 @@ export function Header({ redirect }: HeaderProps): JSX.Element {
           <div className="w-4">
             <PhoneIcon />
           </div>
-          <span>+51 954760305</span>
+          <a href="tel:+51939831937">+51 939 831 937</a>
         </div>
       </div>
       <header className="sticky top-0 z-50 bg-color-primary py-4">

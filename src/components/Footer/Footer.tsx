@@ -12,7 +12,7 @@ export function Footer(): JSX.Element {
   const [toggle, setToggle] = useToggle(false);
 
   // 📱 Configuración de contacto
-  const WHATSAPP_NUMBER = '51954760305'; // Formato: código país + número (sin +, espacios ni guiones)
+  const WHATSAPP_NUMBER = '51939831937'; // Formato: código país + número (sin +, espacios ni guiones)
   const WHATSAPP_MESSAGE = 'Hola, me gustaría obtener más información sobre sus servicios.';
   const LINKEDIN_URL = 'https://www.linkedin.com/company/lc-software-consultoria'; // Cambiar por tu URL real
 
@@ -36,12 +36,6 @@ export function Footer(): JSX.Element {
                 <div>
                   <EnvelopeIcon />
                 </div>
-                <li>olazaro@lcsoft.pe</li>
-              </li>
-              <li className="grid grid-cols-[2em_1fr] items-center gap-2">
-                <div>
-                  <EnvelopeIcon />
-                </div>
                 <ul>
                   <li>elazaro@lcsoft.pe</li>
                 </ul>
@@ -50,7 +44,7 @@ export function Footer(): JSX.Element {
                 <div>
                   <PhoneIcon />
                 </div>
-                +51 954760305
+                +51 939 831 937
               </li>
             </ul>
           </div>
